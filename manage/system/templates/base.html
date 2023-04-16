@@ -2,6 +2,7 @@
 {% load mptt_tags %}
 {% load group_tag %}
 {% load cat_file %}
+{% load cat_entities %}
 {%if request.user.is_authenticated%}
     <li class="last">{{user.username}} | <a href="/logout">Login out</a></li>
 {%else%}
@@ -70,17 +71,28 @@
                                 <ul class="files-currrent-list">
                                     {% current_category_files as cf %}
 
+                                    {% current_entities as ce %}
 
 
-                                    {% for a in cf %}
-                                        {% if node.cat_file_id == a.id %}
-                                            <a href="{{a.file.url}}" target="_blank">{{a.file_name}}</a>
-                                            <div>{{a.file_version}}</div>
-                                             <div>{{a.id_document.doc_name}}</div><br>
+
+
+                                    {% for ent in ce %}
+                                        {% if node.id == ent.id_entities_id %}
+                                            {% for a in cf %}
+                                                {% if ent.id_file_id == a.id %}
+                                                    <a href="{{a.file.url}}" target="_blank">{{a.file_name}}</a>
+                                                    <div>{{a.file_version}}</div>
+                                                    <div>{{a.id_document.doc_name}}</div><br>
+                                                {% endif %}
+                                            {% endfor %}
 
                                         {% endif %}
 
                                     {% endfor %}
+
+
+
+
 
 
 
@@ -277,5 +289,4 @@
 {%endif%}
 
 <hr>
-
 
