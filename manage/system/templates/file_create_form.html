@@ -1,21 +1,33 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>File</title>
-</head>
-<body>
-    <form action="/add-file/" method="post" enctype="multipart/form-data">
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% block content %}
+   <!-- <form action="/add-file/" method="post" enctype="multipart/form-data">
 
         {% csrf_token %}
 
-        {{ form }}
-
+        {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Сохранить</button>
     <input type="submit" value="Сохранить">
-    </form>
-    <a href='/'><button type="GET">Назад</button></a>
-</body>
-</html>
+    </form>-->
+<style>
+    .form-group {
+        margin-left: 20px;
+        margin-top: 20px;
+        width: 500px;
+        border: 1px;
+    }
+</style>
+<div class="container mt-3">
+    <center>
+        <div class="form-group">
+            <h3>Добавьте файл</h3>
+            <br>
+            {% bootstrap_form form %}
+            {% bootstrap_form_errors form %}
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <a href='/'><button type="GET" class="btn btn-primary">Назад</button></a>
+        </div>
+    </center>
+</div>
+{% endblock %}

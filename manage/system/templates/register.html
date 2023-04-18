@@ -1,15 +1,41 @@
-{% extends 'base.html' %}
+<!-- Шаблон регистрации поьзователя -->
+
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
 
 {% block content %}
 
-<h1>Зарегистрируйся по-братски!</h1>
-<form method="post">
-    {%csrf_token%}
-{%for f in form%}
-    <p><label class="form-label" for="{{f.id_for_label}}">{{f.label}}: </label>{{f}}</p>
-    <div class="form-error">{{f.errors}}</div>
-{%endfor%}
-    <button type="submit">Зарегистрироваться</button>
-</form>
+<style>
+    .form-group {
+        margin-left: 20px;
+        margin-top: 20px;
+        width: 300px
+        border: 1px solid black;
+    }
+
+</style>
+
+<center>
+    <h2>Зарегистрируйся по-братски!</h2>
+</center>
+
+<div class="container mt-3">
+    <center>
+        <div class="form-group">
+            <form method="post" class="card p-3 mt-5">
+                {%csrf_token%}
+                {%for f in form%}
+                    <p><label class="form-label" for="{{f.id_for_label}}">{{f.label}}: </label>{{f}}</p>
+                    <div class="form-error">{{f.errors}}</div>
+                {%endfor%}
+            <button type="submit" class="btn btn-primary mt-3 ">Зарегистрироваться</button>
+
+            </form>
+       </div>
+    </center>
+</div>
+
+
 
 {%endblock%}

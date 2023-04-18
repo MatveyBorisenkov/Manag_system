@@ -7,7 +7,7 @@ from django.template import loader, Context, RequestContext
 from django.views.generic import ListView
 from .models import Entities, Files
 from .forms import EntitiesForm, DocumentsAddForm, FilesAddForm, RegisterUserForm
-from django.views.generic import ListView, DetailView, CreateView, View, TemplateView
+from django.views.generic import ListView, DetailView, CreateView, View, TemplateView, UpdateView
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -105,6 +105,25 @@ class DocumentCreate(CreateView):
     form_class = DocumentsAddForm
     template_name = 'document_create_form.html'
     success_url = reverse_lazy('document-form')
+
+class FileCreate(CreateView):
+    """
+    A class-based view for creating a new file.
+
+    Args:
+        form_class (Form): The form class to use for creating the file.
+        template_name (str): The name of the template to render for the file creation form.
+        success_url (str): The URL to redirect to upon successful file creation.
+
+    Attributes:
+        form_class (Form): The form class to use for creating the file.
+        template_name (str): The name of the template to render for the file creation form.
+        success_url (str): The URL to redirect to upon successful file creation.
+    """
+
+    form_class = FilesAddForm
+    template_name = 'file_create_form.html'
+    success_url = reverse_lazy('file-form')
 
 
 #TODO:remake entities_form function in class method
@@ -291,5 +310,13 @@ class ViewFiles(ListView):
     """
     model = Files
     template_name = 'files_view.html'
+
+
+class FileUpdate(UpdateView):
+
+    model = Files
+    template_name = 'file_create_form.html'
+    fields = {'file_name', 'file', 'file_version' }
+
 
 

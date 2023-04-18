@@ -1,128 +1,163 @@
 <!-- TODO: Убрать ненужные закомментированные строчки кода -->
+<!-- Базовый шаблон главной страницы -->
+
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
 {% load mptt_tags %}
 {% load group_tag %}
 {% load cat_file %}
 {% load cat_entities %}
+
+<style>
+    .container {
+        margin-left: 20px;
+        margin-top: 20px;
+
+    }
+    li {
+        list-style-type: none;
+    }
+
+</style>
+
 {%if request.user.is_authenticated%}
-    <li class="last">{{user.username}} | <a href="/logout">Login out</a></li>
+    <div class="container">
+        <li class="last"> {{user.username}} | <a href="/logout">Login out</a></li>
+    </div>
 {%else%}
-    <li class="last"><a href="/register">Registration</a> | <a href=" ">Login</a></li>
+    <li class="last"><a href="/register">Registration</a> | <a href="/login">Login</a></li>
 {%endif%}
-<hr>
+
+<div class="container">
+    <hr>
+</div>
+
 {%if request.user.is_authenticated%}
     {% if request.user|has_group:"Администратор" %}
-
-        <div class="category-list-name">Доступные функции</div><br>
-        <a href='/form'><button type="GET">Создать категорию</button></a>
-        <a href='/files'><button type="GET">Просмотреть файлы</button></a><br>
-        <br><a href='/add-document'><button type="GET">Добавить документ</button></a>
-        <a href='/add-file'><button type="GET">Добавить файл</button></a>
-        <hr>
-        <div>Дерево категорий</div>
-        <ul>
-        {% recursetree object_list %}
-
-            <li>
-                <!--<a href="/category/{{ node.ent_name }}/">
-                {{ node.ent_name }}
-                {{ node.id }}
-                {{ node.level }}
-                </a>-->
-                <a href="/category/{{ node.id }}/">
-                {{ node.ent_name }}
-                <!--{{ node.id }}-->
-                <!--{{ node.level }}-->
-                </a>
-                {% if node.is_root_node %}
-                    {% if node.id == root_category_id %}
-                        {% if not node.is_leaf_node %}
-                            <ul class="children">
-                                {{ children }}
+        <div class="container">
+           <div class="category-list-name">Доступные функции</div><br>
+            <a href='/form'><button type="GET" class="btn btn-secondary btn-sm">Создать категорию</button></a>
+            <a href='/files'><button type="GET" class="btn btn-secondary btn-sm">Просмотреть файлы</button></a><br>
+            <br><a href='/add-document'><button type="GET" class="btn btn-secondary btn-sm">Добавить документ</button></a>
+            <a href='/add-file'><button type="GET" class="btn btn-secondary btn-sm">Добавить файл</button></a>
+            <hr>
+            <div>Дерево категорий</div>
+            <ul>
 
 
-                            </ul>
-                        {% endif %}
-                    {% endif %}
+            {% recursetree object_list %}
 
-                {% else %}
-                    {% if not node.is_leaf_node %}
-                        {% if current_category.id == node.id %}
-                            <ul class="children">
-                                {{ children }}
-
-
-
-
-
-
-
-                            </ul>
-
-                        {% elif node.level < current_category.level %}
-                            <ul class="children">
-                                {{ children }}
-                            </ul>
-                        {% endif %}
-                    {% endif %}
-
-                {% if node.is_leaf_node %}
-                        {% if current_category.id == node.id %}
-                            {% if node.cat_file_id != "NULL" %}
-                                <ul class="files-currrent-list">
-                                    {% current_category_files as cf %}
-
-                                    {% current_entities as ce %}
+                <li>
+                    <!--<a href="/category/{{ node.ent_name }}/">
+                    {{ node.ent_name }}
+                    {{ node.id }}
+                    {{ node.level }}
+                    </a>-->
+                    <a href="/category/{{ node.id }}/">
+                    {{ node.ent_name }}
+                    <!--{{ node.id }}-->
+                    <!--{{ node.level }}-->
+                    </a>
+                    {% if node.is_root_node %}
+                        {% if node.id == root_category_id %}
+                            {% if not node.is_leaf_node %}
+                                <ul class="children">
+                                    {{ children }}
 
 
-
-
-                                    {% for ent in ce %}
-                                        {% if node.id == ent.id_entities_id %}
-                                            {% for a in cf %}
-                                                {% if ent.id_file_id == a.id %}
-                                                    <a href="{{a.file.url}}" target="_blank">{{a.file_name}}</a>
-                                                    <div>{{a.file_version}}</div>
-                                                    <div>{{a.id_document.doc_name}}</div><br>
-                                                {% endif %}
-                                            {% endfor %}
-
-                                        {% endif %}
-
-                                    {% endfor %}
-
-
-
-
-
-
-
-
-
-
-
-                                        <!--{% if node.cat_file_id == cf.id %}
-                                            <a href="{{file.file.url}}" target="_blank">{{file.file_name}}</a>
-                                            <div>{{file.file_version}}</div>
-                                             <div>{{file.id_document.doc_name}}</div><br>
-                                        {% else %}
-                                            <div>Нет файлов</div>
-                                        {% endif %}-->
-
-
-
-                                </ul>
-                            {% else %}
-                                <ul class="none-files-currrent-list">
-                                    <div>Нет прикрепленных файлов</div>
                                 </ul>
                             {% endif %}
                         {% endif %}
-                {% endif %}
 
-                {% endif %}
-            </li>
-        {% endrecursetree %}
-        </ul>
+                    {% else %}
+                        {% if not node.is_leaf_node %}
+                            {% if current_category.id == node.id %}
+                                <ul class="children">
+                                    {{ children }}
+
+
+
+
+
+
+
+                                </ul>
+
+                            {% elif node.level < current_category.level %}
+                                <ul class="children">
+                                    {{ children }}
+                                </ul>
+                            {% endif %}
+                        {% endif %}
+
+                    {% if node.is_leaf_node %}
+                            {% if current_category.id == node.id %}
+                                {% if node.cat_file_id != "NULL" %}
+                                    <ul class="files-currrent-list">
+                                        {% current_category_files as cf %}
+
+                                        {% current_entities as ce %}
+
+
+
+
+                                        {% for ent in ce %}
+                                            {% if node.id == ent.id_entities_id %}
+                                                {% for a in cf %}
+                                                    {% if ent.id_file_id == a.id %}
+                                                        <div class="files-cont">
+
+                                                            <a href="{{a.file.url}}" target="_blank">{{a.file_name}}</a>
+                                                            <div>{{a.file_version}}</div>
+                                                            <div>{{a.id_document.doc_name}}</div>
+                                                            <a href='/file-update'>Редактировать файл</a>
+                                                            <hr style="width:200px">
+
+                                                        <div>
+
+                                                    {% endif %}
+                                                {% endfor %}
+
+                                            {% endif %}
+
+                                        {% endfor %}
+
+
+
+
+
+
+
+
+
+
+
+                                            <!--{% if node.cat_file_id == cf.id %}
+                                                <a href="{{file.file.url}}" target="_blank">{{file.file_name}}</a>
+                                                <div>{{file.file_version}}</div>
+                                                 <div>{{file.id_document.doc_name}}</div><br>
+                                            {% else %}
+                                                <div>Нет файлов</div>
+                                            {% endif %}-->
+
+
+
+                                    </ul>
+                                {% else %}
+                                    <ul class="none-files-currrent-list">
+                                        <div>Нет прикрепленных файлов</div>
+                                    </ul>
+                                {% endif %}
+                            {% endif %}
+                    {% endif %}
+
+                    {% endif %}
+                </li>
+            {% endrecursetree %}
+
+            </ul>
+        </div>
         <!--<a href='/login'><button type="GET">Авторизоваться</button></a>
         <a href='/register'><button type="GET">Зарегистрироваться</button></a>-->
     {% endif %}
@@ -288,5 +323,5 @@
     {% endif %}
 {%endif%}
 
-<hr>
+
 

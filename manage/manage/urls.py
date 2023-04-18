@@ -18,7 +18,7 @@ from django.urls import re_path
 from django.conf import settings
 from django.views.static import serve
 from django.urls import path
-from system.views import EntitiesListView, DocumentCreate, LoginUser, ViewFiles
+from system.views import EntitiesListView, DocumentCreate, LoginUser, ViewFiles, FileUpdate, FileCreate
 from system.views import category_detail, entities_form, files_form, logout_user, UserRegister
 
 
@@ -28,11 +28,12 @@ urlpatterns = [
     path('category/<my_id>/', category_detail, name='category-detail'),
     path('form/', entities_form, name='entities-form'),
     path('add-document/', DocumentCreate.as_view(), name='document-form'),
-    path('add-file/', files_form, name='file-form'),
+    path('add-file/', FileCreate.as_view(), name='file-form'),
     path('register/', UserRegister, name='register' ),
     path('login/', LoginUser.as_view(), name='login'),
     path('logout/', logout_user, name = 'logout'),
     path('files/', ViewFiles.as_view(), name = 'files'),
+    path('file-update/', FileUpdate.as_view(), name = 'file-update'),
 ]
 
 if settings.DEBUG:

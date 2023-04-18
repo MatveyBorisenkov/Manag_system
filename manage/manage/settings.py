@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'mptt',
     'system.apps.SystemConfig',
     'django_mptt_admin',
+    'bootstrap5',
 
 ]
 
