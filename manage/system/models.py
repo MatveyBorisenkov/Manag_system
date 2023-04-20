@@ -45,6 +45,9 @@ class Files(models.Model):
     def __str__(self):
         return f"{self.id} {self.file_name} {self.id_document}"
 
+    def get_absolute_url(self):
+        return reverse('cat-files')
+
 
 
 class Entities(MPTTModel):

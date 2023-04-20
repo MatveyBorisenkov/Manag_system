@@ -18,7 +18,7 @@ from django.urls import re_path
 from django.conf import settings
 from django.views.static import serve
 from django.urls import path
-from system.views import EntitiesListView, DocumentCreate, LoginUser, ViewFiles, FileUpdate, FileCreate
+from system.views import EntitiesListView, DocumentCreate, LoginUser, ViewFiles, FileUpdate, FileCreate, FilesToCategories, SearchFiles
 from system.views import category_detail, entities_form, files_form, logout_user, UserRegister
 
 
@@ -34,6 +34,8 @@ urlpatterns = [
     path('logout/', logout_user, name = 'logout'),
     path('files/', ViewFiles.as_view(), name = 'files'),
     path('file-update/', FileUpdate.as_view(), name = 'file-update'),
+    path('files-cat/', FilesToCategories.as_view(), name = 'cat-files'),
+    path('search-file/', SearchFiles.as_view(), name = 'search')
 ]
 
 if settings.DEBUG:

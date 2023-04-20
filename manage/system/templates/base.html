@@ -41,7 +41,18 @@
             <a href='/files'><button type="GET" class="btn btn-secondary btn-sm">Просмотреть файлы</button></a><br>
             <br><a href='/add-document'><button type="GET" class="btn btn-secondary btn-sm">Добавить документ</button></a>
             <a href='/add-file'><button type="GET" class="btn btn-secondary btn-sm">Добавить файл</button></a>
+            <a href='/files-cat'><button type="GET" class="btn btn-secondary btn-sm">Привязать файл</button></a>
             <hr>
+
+            <div class="search">
+                <form action="/search-file/" method="get">
+                    <input name="q" type="text" placeholder="Search...">
+                    <button type="submit" class="btn btn-secondary btn-sm">OK</button>
+                </form>
+            </div>
+
+            <hr>
+
             <div>Дерево категорий</div>
             <ul>
 

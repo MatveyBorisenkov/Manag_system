@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.forms import ModelForm
 from django import forms
 from django.shortcuts import redirect
-from .models import Entities, Files, Documents, Users, User_groups
+from .models import Entities, Files, Documents, Users, User_groups, RelationsFiles
 import uuid
 from django.contrib.auth import login
 from django.contrib.auth.models import User
@@ -93,3 +93,12 @@ class LoginUserForm(AuthenticationForm):
     """Форма для авторизации пользователей"""
     username=forms.CharField(label='Login', widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
+
+class RelationFileForm(forms.ModelForm):
+
+    class Meta:
+
+        model = RelationsFiles
+        fields = ('id_entities', 'id_file')
+

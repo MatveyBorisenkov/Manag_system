@@ -6,12 +6,13 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import loader, Context, RequestContext
 from django.views.generic import ListView
 from .models import Entities, Files
-from .forms import EntitiesForm, DocumentsAddForm, FilesAddForm, RegisterUserForm
+from .forms import EntitiesForm, DocumentsAddForm, FilesAddForm, RegisterUserForm, RelationFileForm
 from django.views.generic import ListView, DetailView, CreateView, View, TemplateView, UpdateView
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
+from django.db.models import Q
 
 # Create your views here.
 
@@ -123,7 +124,7 @@ class FileCreate(CreateView):
 
     form_class = FilesAddForm
     template_name = 'file_create_form.html'
-    success_url = reverse_lazy('file-form')
+    success_url = reverse_lazy('cat-files')
 
 
 #TODO:remake entities_form function in class method
@@ -313,10 +314,56 @@ class ViewFiles(ListView):
 
 
 class FileUpdate(UpdateView):
+    """
+    A class-based view for updating an existing file object.
+
+    Args:
+        UpdateView: A Django generic view for updating an object.
+
+    Attributes:
+        model (Model): The model class that the view will be working with.
+        template_name (str): The name of the template to be rendered.
+        fields (set): The fields that will be displayed in the form.
+
+    Returns:
+        A rendered HTML template with a form for updating an existing file object.
+    """
 
     model = Files
     template_name = 'file_create_form.html'
     fields = {'file_name', 'file', 'file_version' }
+
+
+class FilesToCategories(CreateView):
+    """
+    A class-based view that handles the creation of a new relation between a file and a category.
+
+    Attributes:
+        form_class (RelationFileForm): The form class used for creating a new relation.
+        template_name (str): The name of the template used for rendering the view.
+        success_url (reverse_lazy): The URL to redirect to upon successful creation of a new relation.
+
+    Methods:
+        get_context_data: Adds extra context data to the template.
+    """
+    form_class = RelationFileForm
+    template_name = 'file_to_category.html'
+    success_url = reverse_lazy('file-form')
+
+
+class SearchFiles(ListView):
+
+    model = Files
+    template_name = 'search_file_result.html'
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+
+        object_list = Files.objects.filter(
+            Q(file_name__icontains=query)
+        )
+
+        return object_list
 
 
 
