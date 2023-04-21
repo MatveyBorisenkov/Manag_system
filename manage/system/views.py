@@ -1,18 +1,25 @@
+from _ast import Add
+
 from django.contrib.auth import logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import loader, Context, RequestContext
 from django.views.generic import ListView
 from .models import Entities, Files
-from .forms import EntitiesForm, DocumentsAddForm, FilesAddForm, RegisterUserForm, RelationFileForm
-from django.views.generic import ListView, DetailView, CreateView, View, TemplateView, UpdateView
+from .forms import EntitiesForm, DocumentsAddForm, FilesAddForm, RegisterUserForm, RelationFileForm, DeleteCatForm
+from django.views.generic import ListView, DetailView, CreateView, View, TemplateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 from django.db.models import Q
+from django.contrib import messages
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
+
 
 # Create your views here.
 
@@ -127,6 +134,14 @@ class FileCreate(CreateView):
     success_url = reverse_lazy('cat-files')
 
 
+class AddEntities(PermissionRequiredMixin, CreateView):
+
+    permission_required = 'system.add_entities'
+    form_class = EntitiesForm
+    template_name = 'entities_create_form.html'
+    success_url = reverse_lazy('entities-form')
+
+
 #TODO:remake entities_form function in class method
 def entities_form(request):
     """
@@ -141,18 +156,18 @@ def entities_form(request):
     Raises:
         None
     """
-    if request.method == 'POST':
-        form=EntitiesForm(request.POST, request.FILES)
-        if form.is_valid():
-            try:
-                form.save()
-                return HttpResponseRedirect("/form")
-                #return redirect('form-test')
-            except:
-                form.add_error(None, 'Add data error')
-    else:
-        form=EntitiesForm()
-    return render(request, 'entities_create_form.html', {'form': form})
+    # if request.method == 'POST':
+    #     form=EntitiesForm(request.POST, request.FILES)
+    #     if form.is_valid():
+    #         try:
+    #             form.save()
+    #             return HttpResponseRedirect("/form")
+    #             #return redirect('form-test')
+    #         except:
+    #             form.add_error(None, 'Add data error')
+    # else:
+    #     form=EntitiesForm()
+    # return render(request, 'entities_create_form.html', {'form': form})
 
 
 
@@ -367,3 +382,51 @@ class SearchFiles(ListView):
 
 
 
+class DeleteCategory(DeleteView):
+
+    model = Entities
+    template_name = 'cat_delete.html'
+
+    def delete_cat(request, new_id):
+        new_to_delete = get_object_or_404(Entities, id=new_id)
+        print(new_to_delete)
+
+        if request.method == 'POST':
+            form = DeleteCatForm(request.POST, instance=new_to_delete)
+
+            success_message = 'Хотите удалить?'
+            new_to_delete.delete()
+            return HttpResponseRedirect("/")  # wherever to go after deleting
+            messages.success(request, 'Категория удалена')
+
+        else:
+            form = DeleteCatForm(instance=new_to_delete)
+
+        template_vars = {'form': form}
+        return render(request, 'cat_delete.html', template_vars)
+    success_message = ('Are you sure you want to delete')
+    success_url = reverse_lazy('category-list')
+
+@login_required
+@permission_required("system.delete_entities", raise_exception=True)
+def delete_cat(request, new_id):
+
+    new_to_delete = get_object_or_404(Entities, id=new_id)
+    print(new_to_delete)
+
+
+    if request.method == 'POST':
+        form = DeleteCatForm(request.POST, instance=new_to_delete)
+
+        if not request.user.has_perm('system.delete_entities'):
+            raise PermissionDenied
+        else:
+            new_to_delete.delete()
+            return HttpResponseRedirect("/") # wherever to go after deleting
+
+
+    else:
+        form = DeleteCatForm(instance=new_to_delete)
+
+    template_vars = {'form': form}
+    return render(request, 'cat_delete.html', template_vars)

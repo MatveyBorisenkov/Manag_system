@@ -18,15 +18,15 @@ from django.urls import re_path
 from django.conf import settings
 from django.views.static import serve
 from django.urls import path
-from system.views import EntitiesListView, DocumentCreate, LoginUser, ViewFiles, FileUpdate, FileCreate, FilesToCategories, SearchFiles
-from system.views import category_detail, entities_form, files_form, logout_user, UserRegister
+from system.views import EntitiesListView, DocumentCreate, LoginUser, ViewFiles, FileUpdate, FileCreate, FilesToCategories, SearchFiles, AddEntities
+from system.views import category_detail, entities_form, files_form, logout_user, UserRegister, DeleteCategory, delete_cat
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', EntitiesListView.as_view(), name='category-list'),
     path('category/<my_id>/', category_detail, name='category-detail'),
-    path('form/', entities_form, name='entities-form'),
+    path('form/', AddEntities.as_view(), name='entities-form'),
     path('add-document/', DocumentCreate.as_view(), name='document-form'),
     path('add-file/', FileCreate.as_view(), name='file-form'),
     path('register/', UserRegister, name='register' ),
@@ -35,7 +35,8 @@ urlpatterns = [
     path('files/', ViewFiles.as_view(), name = 'files'),
     path('file-update/', FileUpdate.as_view(), name = 'file-update'),
     path('files-cat/', FilesToCategories.as_view(), name = 'cat-files'),
-    path('search-file/', SearchFiles.as_view(), name = 'search')
+    path('search-file/', SearchFiles.as_view(), name = 'search'),
+    path('category/<new_id>/delete', delete_cat, name= "delete"),
 ]
 
 if settings.DEBUG:

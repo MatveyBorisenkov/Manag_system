@@ -47,13 +47,15 @@
             <div class="search">
                 <form action="/search-file/" method="get">
                     <input name="q" type="text" placeholder="Search...">
-                    <button type="submit" class="btn btn-secondary btn-sm">OK</button>
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">
+                        <img src="../static/static_files/search.png" alt="Иконка" width="20" height="20">
+                    </button>
                 </form>
             </div>
 
             <hr>
 
-            <div>Дерево категорий</div>
+            <div>Дерево категорий:</div>
             <ul>
 
 
@@ -274,6 +276,7 @@
 
     {% if request.user|has_group:"Просмотр" %}
         <div>У вас недостаточно прав для доступа к данному разделу</div>
+        <a href='/form'><button type="GET">Создать категорию</button></a> <br>
         <hr>
         <div>Дерево категорий</div>
         <ul>

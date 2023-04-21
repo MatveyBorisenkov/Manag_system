@@ -102,3 +102,9 @@ class RelationFileForm(forms.ModelForm):
         model = RelationsFiles
         fields = ('id_entities', 'id_file')
 
+
+
+class DeleteCatForm(forms.ModelForm):
+    class Meta:
+        model = Entities
+        fields = '__all__'
