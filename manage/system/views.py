@@ -19,6 +19,8 @@ from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.views import PasswordChangeDoneView, PasswordChangeView
+from django.contrib.auth.forms import PasswordChangeForm
 
 
 # Create your views here.
@@ -132,6 +134,28 @@ class FileCreate(CreateView):
     form_class = FilesAddForm
     template_name = 'file_create_form.html'
     success_url = reverse_lazy('cat-files')
+
+#загрузка нескольких файлов одновременно
+# def multiplay_files(request):
+#     user = request.user
+#     if request.method == 'POST':
+#         form = MultFilesModelForm(request.POST)
+#         file_form = FilesAddForm(request.POST, request.FILES)
+#         files = request.FILES.getlist('file') #field name in model
+#         if form.is_valid() and file_form.is_valid():
+#             feed_instance = form.save(commit=False)
+#             feed_instance.user = user
+#             feed_instance.save()
+#
+#             for f in files:
+#                 file_instance = Files(file=f, feed=feed_instance)
+#                 file_instance.save()
+#             return HttpResponseRedirect("/form")
+#     else:
+#         form = MultFilesModelForm()
+#         file_form = FilesAddForm()
+#
+#     return render(request, 'file_create_form.html', {'form': form})
 
 
 class AddEntities(PermissionRequiredMixin, CreateView):
@@ -387,29 +411,25 @@ class DeleteCategory(DeleteView):
     model = Entities
     template_name = 'cat_delete.html'
 
-    def delete_cat(request, new_id):
-        new_to_delete = get_object_or_404(Entities, id=new_id)
-        print(new_to_delete)
-
-        if request.method == 'POST':
-            form = DeleteCatForm(request.POST, instance=new_to_delete)
-
-            success_message = 'Хотите удалить?'
-            new_to_delete.delete()
-            return HttpResponseRedirect("/")  # wherever to go after deleting
-            messages.success(request, 'Категория удалена')
-
-        else:
-            form = DeleteCatForm(instance=new_to_delete)
-
-        template_vars = {'form': form}
-        return render(request, 'cat_delete.html', template_vars)
-    success_message = ('Are you sure you want to delete')
-    success_url = reverse_lazy('category-list')
 
 @login_required
 @permission_required("system.delete_entities", raise_exception=True)
 def delete_cat(request, new_id):
+    """
+    Deletes a cat entity with the given ID.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        new_id (int): The ID of the cat entity to be deleted.
+
+    Returns:
+        HttpResponseRedirect: Redirects to the homepage after deleting the cat entity.
+
+    Raises:
+        Http404: If the cat entity with the given ID does not exist.
+        PermissionDenied: If the user does not have permission to delete entities.
+    """
+
 
     new_to_delete = get_object_or_404(Entities, id=new_id)
     print(new_to_delete)
@@ -430,3 +450,18 @@ def delete_cat(request, new_id):
 
     template_vars = {'form': form}
     return render(request, 'cat_delete.html', template_vars)
+
+
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect("/login")
+        else:
+            messages.error(request, 'Please correct the error below')
+            return HttpResponseRedirect("/password-change")
+    else:
+        form = PasswordChangeForm(user=request.user)
+
+    return render(request, 'password_change_form.html', {'form': form})

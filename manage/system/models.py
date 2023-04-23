@@ -23,6 +23,15 @@ class Documents(models.Model):
     def __str__(self):
         return f"{self.id} {self.doc_name} {self.document_language}"
 
+# class MultFiles(models.Model):
+#
+#     class Meta:
+#         db_table = "mult_files"
+#         verbose_name = "Вспомогательная таблица"
+#         verbose_name_plural = "Вспомогательная таблица"
+#
+#     some_text = models.CharField(max_length=50)
+#     text=models.TextField(blank=False, max_length=500)
 
 class Files(models.Model):
     """Модель таблицы для хранения информации о файлах."""
@@ -37,6 +46,7 @@ class Files(models.Model):
     file = models.FileField(blank=True, null=True, upload_to='files/%Y/%m/%D/', verbose_name='Файлы')
     file_version = models.CharField(max_length=20, verbose_name='Версия файла')
     add_data = models.DateTimeField(default=timezone.now, verbose_name='Дата добавления')
+    #feed = models.ForeignKey(MultFiles, on_delete=models.CASCADE)
     #slug = models.SlugField(max_length=255, unique=True, db_index=True, default=True, verbose_name='URL')
 
     def get_html_file(self, object):

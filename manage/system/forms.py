@@ -1,17 +1,18 @@
 from cProfile import label
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.forms import ModelForm
 from django import forms
 from django.shortcuts import redirect
 from .models import Entities, Files, Documents, Users, User_groups, RelationsFiles
 import uuid
 from django.contrib.auth import login
 from django.contrib.auth.models import User
+from django.forms import ClearableFileInput
 
 
 
 class EntitiesForm(forms.ModelForm):
     """Форма для внесения новых категорий в базу данных"""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['parent'].empty_label = 'Родитель не выбран'
@@ -52,7 +53,7 @@ class FilesAddForm(forms.ModelForm):
     # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
     #     #self.fields['id_document'].empty_label = 'Выберите к какому документу привязать файл'
-    file = forms.FileField()
+    #file = forms.FileField()
 
     class Meta:
         model = Files
@@ -62,6 +63,7 @@ class FilesAddForm(forms.ModelForm):
         widgets ={
             'file_name': forms.TextInput(attrs={'class': 'form-control'}),
             'file_version': forms.TextInput(attrs={'class': 'form-control'}),
+            'file': ClearableFileInput(attrs={'multiple': True}),
 
 
         }
@@ -96,7 +98,7 @@ class LoginUserForm(AuthenticationForm):
 
 
 class RelationFileForm(forms.ModelForm):
-
+    """ Форма для привязки файлов к категории"""
     class Meta:
 
         model = RelationsFiles
@@ -105,6 +107,7 @@ class RelationFileForm(forms.ModelForm):
 
 
 class DeleteCatForm(forms.ModelForm):
+    """Форма удаления категории"""
     class Meta:
         model = Entities
         fields = '__all__'

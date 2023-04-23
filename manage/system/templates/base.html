@@ -20,14 +20,15 @@
     }
 
 </style>
+<div class="container">
+    {%if request.user.is_authenticated%}
 
-{%if request.user.is_authenticated%}
-    <div class="container">
-        <li class="last"> {{user.username}} | <a href="/logout">Login out</a></li>
-    </div>
-{%else%}
-    <li class="last"><a href="/register">Registration</a> | <a href="/login">Login</a></li>
-{%endif%}
+            <li class="last"> {{user.username}} | <a href="/logout">Login out</a> | <a href='/password-change'><button type="GET" class="btn btn-link">Сменить пароль</button></a> </li>
+
+    {%else%}
+        <li class="last"><a href="/register">Registration</a> | <a href="/login">Login</a></li>
+    {%endif%}
+</div>
 
 <div class="container">
     <hr>
@@ -176,160 +177,165 @@
     {% endif %}
 
     {% if request.user|has_group:"Полный" %}
+        <div class="container">
+            <div class="category-list-name">Доступные функции</div>
+            <a href='/files'><button type="GET">Просмотреть файлы</button></a><br>
+            <a href='/form'><button type="GET">Создать категорию</button></a> <br>
+            <br><a href='/add-document'><button type="GET">Добавить документ</button></a>
+            <a href='/add-file'><button type="GET">Добавить файл</button></a>
+            <hr>
+            <div>Дерево категорий</div>
+            <ul>
+            {% recursetree object_list %}
+                <li>
+                    <!--<a href="/category/{{ node.ent_name }}/">
+                    {{ node.ent_name }}
+                    {{ node.id }}
+                    {{ node.level }}
+                    </a>-->
+                    <a href="/category/{{ node.id }}/">
+                    {{ node.ent_name }}
+                    <!--{{ node.id }}-->
+                    <!--{{ node.level }}-->
+                    </a>
+                    {% if node.is_root_node %}
+                        {% if node.id == root_category_id %}
+                            {% if not node.is_leaf_node %}
+                                <ul class="children">
+                                    {{ children }}
+                                </ul>
+                            {% endif %}
+                        {% endif %}
 
-        <div class="category-list-name">Доступные функции</div>
-        <a href='/files'><button type="GET">Просмотреть файлы</button></a><br>
-        <a href='/form'><button type="GET">Создать категорию</button></a> <br>
-        <br><a href='/add-document'><button type="GET">Добавить документ</button></a>
-        <a href='/add-file'><button type="GET">Добавить файл</button></a>
-        <hr>
-        <div>Дерево категорий</div>
-        <ul>
-        {% recursetree object_list %}
-            <li>
-                <!--<a href="/category/{{ node.ent_name }}/">
-                {{ node.ent_name }}
-                {{ node.id }}
-                {{ node.level }}
-                </a>-->
-                <a href="/category/{{ node.id }}/">
-                {{ node.ent_name }}
-                <!--{{ node.id }}-->
-                <!--{{ node.level }}-->
-                </a>
-                {% if node.is_root_node %}
-                    {% if node.id == root_category_id %}
+                    {% else %}
                         {% if not node.is_leaf_node %}
-                            <ul class="children">
-                                {{ children }}
-                            </ul>
+                            {% if current_category.id == node.id %}
+                                <ul class="children">
+                                    {{ children }}
+                                </ul>
+                            {% elif node.level < current_category.level %}
+                                <ul class="children">
+                                    {{ children }}
+                                </ul>
+                            {% endif %}
                         {% endif %}
                     {% endif %}
-
-                {% else %}
-                    {% if not node.is_leaf_node %}
-                        {% if current_category.id == node.id %}
-                            <ul class="children">
-                                {{ children }}
-                            </ul>
-                        {% elif node.level < current_category.level %}
-                            <ul class="children">
-                                {{ children }}
-                            </ul>
-                        {% endif %}
-                    {% endif %}
-                {% endif %}
-            </li>
-        {% endrecursetree %}
-        </ul>
+                </li>
+            {% endrecursetree %}
+            </ul>
+        </div>
         <!--<a href='/login'><button type="GET">Авторизоваться</button></a>
         <a href='/register'><button type="GET">Зарегистрироваться</button></a>-->
     {% endif %}
 
     {% if request.user|has_group:"Редактирование" %}
+        <div class="container">
+            <div class="category-list-name">Доступные функции</div><br>
+            <a href='/files'><button type="GET">Просмотреть файлы</button></a>
+            <a href='/add-document'><button type="GET">Добавить документ</button></a>
+            <a href='/add-file'><button type="GET">Добавить файл</button></a>
+            <hr>
+            <div>Дерево категорий</div>
+            <ul>
+            {% recursetree object_list %}
+                <li>
+                    <!--<a href="/category/{{ node.ent_name }}/">
+                    {{ node.ent_name }}
+                    {{ node.id }}
+                    {{ node.level }}
+                    </a>-->
+                    <a href="/category/{{ node.id }}/">
+                    {{ node.ent_name }}
+                    <!--{{ node.id }}-->
+                    <!--{{ node.level }}-->
+                    </a>
+                    {% if node.is_root_node %}
+                        {% if node.id == root_category_id %}
+                            {% if not node.is_leaf_node %}
+                                <ul class="children">
+                                    {{ children }}
+                                </ul>
+                            {% endif %}
+                        {% endif %}
 
-        <div class="category-list-name">Доступные функции</div><br>
-        <a href='/files'><button type="GET">Просмотреть файлы</button></a>
-        <a href='/add-document'><button type="GET">Добавить документ</button></a>
-        <a href='/add-file'><button type="GET">Добавить файл</button></a>
-        <hr>
-        <div>Дерево категорий</div>
-        <ul>
-        {% recursetree object_list %}
-            <li>
-                <!--<a href="/category/{{ node.ent_name }}/">
-                {{ node.ent_name }}
-                {{ node.id }}
-                {{ node.level }}
-                </a>-->
-                <a href="/category/{{ node.id }}/">
-                {{ node.ent_name }}
-                <!--{{ node.id }}-->
-                <!--{{ node.level }}-->
-                </a>
-                {% if node.is_root_node %}
-                    {% if node.id == root_category_id %}
+                    {% else %}
                         {% if not node.is_leaf_node %}
-                            <ul class="children">
-                                {{ children }}
-                            </ul>
+                            {% if current_category.id == node.id %}
+                                <ul class="children">
+                                    {{ children }}
+                                </ul>
+                            {% elif node.level < current_category.level %}
+                                <ul class="children">
+                                    {{ children }}
+                                </ul>
+                            {% endif %}
                         {% endif %}
                     {% endif %}
-
-                {% else %}
-                    {% if not node.is_leaf_node %}
-                        {% if current_category.id == node.id %}
-                            <ul class="children">
-                                {{ children }}
-                            </ul>
-                        {% elif node.level < current_category.level %}
-                            <ul class="children">
-                                {{ children }}
-                            </ul>
-                        {% endif %}
-                    {% endif %}
-                {% endif %}
-            </li>
-        {% endrecursetree %}
-        </ul>
+                </li>
+            {% endrecursetree %}
+            </ul>
+        </div>
     {% endif %}
 
     {% if request.user|has_group:"Просмотр" %}
-        <div>У вас недостаточно прав для доступа к данному разделу</div>
-        <a href='/form'><button type="GET">Создать категорию</button></a> <br>
-        <hr>
-        <div>Дерево категорий</div>
-        <ul>
-        {% recursetree object_list %}
-            <li>
-                <!--<a href="/category/{{ node.ent_name }}/">
-                {{ node.ent_name }}
-                {{ node.id }}
-                {{ node.level }}
-                </a>-->
-                <a href="/category/{{ node.id }}/">
-                {{ node.ent_name }}
-                <!--{{ node.id }}-->
-                <!--{{ node.level }}-->
-                </a>
-                {% if node.is_root_node %}
-                    {% if node.id == root_category_id %}
+        <div class="container">
+            <div>У вас недостаточно прав для доступа к данному разделу</div>
+            <a href='/form'><button type="GET">Создать категорию</button></a> <br>
+
+            <hr>
+            <div>Дерево категорий</div>
+            <ul>
+            {% recursetree object_list %}
+                <li>
+                    <!--<a href="/category/{{ node.ent_name }}/">
+                    {{ node.ent_name }}
+                    {{ node.id }}
+                    {{ node.level }}
+                    </a>-->
+                    <a href="/category/{{ node.id }}/">
+                    {{ node.ent_name }}
+                    <!--{{ node.id }}-->
+                    <!--{{ node.level }}-->
+                    </a>
+                    {% if node.is_root_node %}
+                        {% if node.id == root_category_id %}
+                            {% if not node.is_leaf_node %}
+                                <ul class="children">
+                                    {{ children }}
+                                </ul>
+                            {% endif %}
+                        {% endif %}
+
+                    {% else %}
                         {% if not node.is_leaf_node %}
-                            <ul class="children">
-                                {{ children }}
-                            </ul>
+                            {% if current_category.id == node.id %}
+                                <ul class="children">
+                                    {{ children }}
+                                    <!-- TODO: разобраться с выводом списка фалов для подкатегорий -->
+                                    {% block content %}
+                                        <ul class="files-list">
+                                            {% for file in object_list %}
+                                                <p class="first">File name: {{file.file_name}}</p>
+
+                                                <!--<a href="{{file.file}}" download="newfilename">Файл</a>-->
+                                                <a href="{{file.file.url}}" target="_blank">Просмотреть файл</a>
+
+                                            {% endfor %}
+                                        </ul>
+
+                                    {% endblock %}
+                                </ul>
+                            {% elif node.level < current_category.level %}
+                                <ul class="children">
+                                    {{ children }}
+                                </ul>
+                            {% endif %}
                         {% endif %}
                     {% endif %}
-
-                {% else %}
-                    {% if not node.is_leaf_node %}
-                        {% if current_category.id == node.id %}
-                            <ul class="children">
-                                {{ children }}
-                                <!-- TODO: разобраться с выводом списка фалов для подкатегорий -->
-                                {% block content %}
-                                    <ul class="files-list">
-                                        {% for file in object_list %}
-                                            <p class="first">File name: {{file.file_name}}</p>
-
-                                            <!--<a href="{{file.file}}" download="newfilename">Файл</a>-->
-                                            <a href="{{file.file.url}}" target="_blank">Просмотреть файл</a>
-
-                                        {% endfor %}
-                                    </ul>
-
-                                {% endblock %}
-                            </ul>
-                        {% elif node.level < current_category.level %}
-                            <ul class="children">
-                                {{ children }}
-                            </ul>
-                        {% endif %}
-                    {% endif %}
-                {% endif %}
-            </li>
-        {% endrecursetree %}
-        </ul>
+                </li>
+            {% endrecursetree %}
+            </ul>
+        </div>
     {%endif%}
 
     {% if request.user|has_group:"Нет" %}
