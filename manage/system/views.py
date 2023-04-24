@@ -9,7 +9,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import loader, Context, RequestContext
 from django.views.generic import ListView
 from .models import Entities, Files
-from .forms import EntitiesForm, DocumentsAddForm, FilesAddForm, RegisterUserForm, RelationFileForm, DeleteCatForm
+from .forms import EntitiesForm, DocumentsAddForm, FilesAddForm, RegisterUserForm, RelationFileForm, DeleteCatForm, RelationDocumetnForm
 from django.views.generic import ListView, DetailView, CreateView, View, TemplateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -114,7 +114,7 @@ class DocumentCreate(CreateView):
     """
     form_class = DocumentsAddForm
     template_name = 'document_create_form.html'
-    success_url = reverse_lazy('document-form')
+    success_url = reverse_lazy('doc-files')
 
 class FileCreate(CreateView):
     """
@@ -388,6 +388,23 @@ class FilesToCategories(CreateView):
     form_class = RelationFileForm
     template_name = 'file_to_category.html'
     success_url = reverse_lazy('file-form')
+
+
+class DocumentsToFiles(CreateView):
+    """
+    A class-based view that handles the creation of a new relation between a file and a category.
+
+    Attributes:
+        form_class (RelationFileForm): The form class used for creating a new relation.
+        template_name (str): The name of the template used for rendering the view.
+        success_url (reverse_lazy): The URL to redirect to upon successful creation of a new relation.
+
+    Methods:
+        get_context_data: Adds extra context data to the template.
+    """
+    form_class = RelationDocumetnForm
+    template_name = 'document_to_file.html'
+    success_url = reverse_lazy('doc-files')
 
 
 class SearchFiles(ListView):

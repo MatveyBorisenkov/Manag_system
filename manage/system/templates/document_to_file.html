@@ -1,9 +1,7 @@
-<!-- Добавление новых документов -->
+<!-- Привязка файла к категории -->
 {% load bootstrap5 %}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
-{% load crispy_forms_tags %}
-
 {% block content %}
 
 <style>
@@ -14,25 +12,21 @@
 
     }
 </style>
-
 <div class="container mt-3">
     <center>
         <div class="form-group">
-            <h3>Добавьте документ</h3>
+            <h3>Привяжите документ к файлу</h3>
 
-            <form action="/add-document/" method="post" enctype="multipart/form-data" class="card p-3 mt-5">
+            <form action="/doc-file/" method="post" class="card p-3 mt-5">
 
                 {% csrf_token %}
-                {{ form|crispy }}
-                <!--{% bootstrap_form form %}-->
-
+                {% bootstrap_form form %}
 
                 <button type="submit" class="btn btn-primary">Сохранить</button>
 
 
             </form>
             <a href='/'><button type="GET" class="btn btn-secondary">Назад</button></a>
-
         </div>
     </center>
 </div>

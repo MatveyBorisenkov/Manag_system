@@ -9,6 +9,15 @@ from mptt.models import MPTTModel, TreeForeignKey
 import mptt
 import uuid
 
+def document_language_validator(document_language):
+    """Проверка на валидность для выбранного языка докумнета"""
+    if document_language not in ['0', '1']:
+        raise ValidationError(
+            gettext_lazy('%(document_language)s is not a valid language'),
+            params={'document_language': document_language},
+        )
+
+
 class Documents(models.Model):
     class Meta:
         db_table = "documents"
@@ -17,21 +26,22 @@ class Documents(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, verbose_name='Уникальный идентификатор документа')
     doc_name = models.TextField(verbose_name='Название документа')
+    doc_type = models.CharField(max_length=80, verbose_name="Тип документа")
     description = models.TextField(verbose_name='Описание документа')
-    document_language = models.IntegerField(verbose_name='Язык докуменат')# validators=[document_language_validator])
+    document_language = models.IntegerField(verbose_name='Язык докуменат')#validators=[document_language_validator])
+    document = models.FileField(blank=True, null=True, upload_to='docs/', verbose_name='Документ')
 
+    def get_html_document(self, object):
+        if object.document:
+            return mark_safe(f"<a href='{object.document.url}', width=400")
     def __str__(self):
         return f"{self.id} {self.doc_name} {self.document_language}"
 
-# class MultFiles(models.Model):
-#
-#     class Meta:
-#         db_table = "mult_files"
-#         verbose_name = "Вспомогательная таблица"
-#         verbose_name_plural = "Вспомогательная таблица"
-#
-#     some_text = models.CharField(max_length=50)
-#     text=models.TextField(blank=False, max_length=500)
+    def get_absolute_url(self):
+        return reverse('doc-files')
+
+
+
 
 class Files(models.Model):
     """Модель таблицы для хранения информации о файлах."""
@@ -41,19 +51,18 @@ class Files(models.Model):
         verbose_name_plural = "Информация о файлах"
 
     id = models.UUIDField(primary_key=True,default=uuid.uuid4, unique=True, verbose_name="Уникальный идентификатор файла")
-    id_document = models.ForeignKey(Documents, on_delete=models.RESTRICT, verbose_name='ID документа')
+    #id_document = models.ForeignKey(Documents, on_delete=models.RESTRICT, verbose_name='ID документа')
     file_name = models.CharField(max_length=50, unique=True, verbose_name="Имя файла")
     file = models.FileField(blank=True, null=True, upload_to='files/%Y/%m/%D/', verbose_name='Файлы')
     file_version = models.CharField(max_length=20, verbose_name='Версия файла')
     add_data = models.DateTimeField(default=timezone.now, verbose_name='Дата добавления')
-    #feed = models.ForeignKey(MultFiles, on_delete=models.CASCADE)
     #slug = models.SlugField(max_length=255, unique=True, db_index=True, default=True, verbose_name='URL')
 
     def get_html_file(self, object):
         if object.file:
             return mark_safe(f"<a href='{object.file.url}', width=400")
     def __str__(self):
-        return f"{self.id} {self.file_name} {self.id_document}"
+        return f"{self.id} {self.file_name} {self.file_version} {self.file}"
 
     def get_absolute_url(self):
         return reverse('cat-files')
@@ -72,7 +81,7 @@ class Entities(MPTTModel):
                             db_index=True, verbose_name='Родитель сущности')
     ent_name = models.TextField(verbose_name='Имя сущности')
     description = models.TextField(verbose_name='Описание сущности')
-    cat_file = models.ForeignKey(Files, on_delete=models.RESTRICT, null=True, verbose_name='Файл категории' )
+    #cat_file = models.ForeignKey(Files, on_delete=models.RESTRICT, null=True, verbose_name='Файл категории' )
 
     # slug = models.SlugField()
 
@@ -89,35 +98,30 @@ class Entities(MPTTModel):
 
     #mptt.register(Entities, order_insertion_by=['ent_name'])
     def __str__(self):
-        return f"{self.id} {self.parent} {self.ent_name} {self.cat_file}"
+        return f"{self.id} {self.parent} {self.ent_name}"
 
 
 
-def document_language_validator(document_language):
-    """Проверка на валидность для выбранного языка докумнета"""
-    if document_language not in ['0', '1']:
-        raise ValidationError(
-            gettext_lazy('%(document_language)s is not a valid language'),
-            params={'document_language': document_language},
-        )
 
 
-# модель документов
+
 
 
 # модель отношений
-class Relations(models.Model):
+class RelationsDocuments(models.Model):
     class Meta:
-        db_table = "relations"
-        verbose_name = "Отношения"
-        verbose_name_plural = "Отношения"
+        db_table = "relations_documents"
+        verbose_name = "Привязка документов к файлам"
+        verbose_name_plural = "Привязка документов к файлам"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, verbose_name='Уникальный идентивикатор отношения')
-    id_entities = models.ForeignKey(Entities, on_delete=models.RESTRICT, verbose_name='Идентификатор сущности')
-    id_document = models.ForeignKey(Documents, on_delete=models.RESTRICT, verbose_name='Идентификатор документа')
+    id_file = models.ForeignKey(Files, on_delete=models.RESTRICT, verbose_name='ID файла')
+    id_document = models.ForeignKey(Documents, on_delete=models.RESTRICT, verbose_name='ID документа')
 
     def __str__(self):
-        return f"{self.id} {self.id_entities} {self.id_document}"
+        return f"{self.id} {self.id_file} {self.id_document}"
+
+
 
 
 
@@ -128,7 +132,7 @@ class Tags(models.Model):
         verbose_name = "Тэги"
         verbose_name_plural = "Тэги"
 
-    id = models.UUIDField(primary_key=True, verbose_name='Уникальный идентификатор тэга')
+    id = models.UUIDField(primary_key=True, verbose_name='ID тэга')
     tag = models.CharField(max_length=20, unique=True, verbose_name='Тэг')
 
     def __str__(self):
@@ -162,47 +166,47 @@ class RelationsFiles(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True,
                           verbose_name='Уникальный идентивикатор отношения')
-    id_entities = models.ForeignKey(Entities, on_delete=models.RESTRICT, verbose_name='Идентификатор сущности')
-    id_file = models.ForeignKey(Files, on_delete=models.RESTRICT, verbose_name='Идентификатор документа')
+    id_entities = models.ForeignKey(Entities, on_delete=models.RESTRICT, verbose_name='ID категории')
+    id_file = models.ForeignKey(Files, on_delete=models.RESTRICT, verbose_name='ID файла')
 
     def __str__(self):
         return f"{self.id} {self.id_entities} {self.id_file}"
 
 
 # модель пользователей
-class Users(models.Model):
-    class Meta:
-        db_table = "user"
-        verbose_name = "Пользователи"
-        verbose_name_plural = "Пользователи"
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, verbose_name="Уникальный идентификатор пользователя")
-    user_name = models.CharField(max_length=30, unique=True, verbose_name='Имя пользователя')
-    user_password = models.CharField(max_length=16, verbose_name='Пароль')
-    password_hash = models.CharField(max_length=100, verbose_name='Хэш пароля')
-
-    def __str__(self):
-        return f"{self.id} {self.user_name}"
+# class Users(models.Model):
+#     class Meta:
+#         db_table = "user"
+#         verbose_name = "Пользователи"
+#         verbose_name_plural = "Пользователи"
+#
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True, verbose_name="Уникальный идентификатор пользователя")
+#     user_name = models.CharField(max_length=30, unique=True, verbose_name='Имя пользователя')
+#     user_password = models.CharField(max_length=16, verbose_name='Пароль')
+#     password_hash = models.CharField(max_length=100, verbose_name='Хэш пароля')
+#
+#     def __str__(self):
+#         return f"{self.id} {self.user_name}"
 
 
 # модель комментариев
-class Comments(models.Model):
-    """Модель таблицы для хранения комментариев"""
-    class Meta:
-        db_table = "comments"
-        verbose_name = "Комментарии"
-        verbose_name_plural = "Комментарии"
-
-    id = models.UUIDField(primary_key=True, verbose_name="Уникальный идентификатор комментария")
-    id_document = models.ForeignKey(Documents, on_delete=models.RESTRICT,
-                                    verbose_name='ID документа к которому добавлен комментарий')
-    id_user = models.ForeignKey(Users, on_delete=models.RESTRICT,
-                                verbose_name='ID пользователя, добавившего комментарий')
-    comment = models.TextField(blank=True, verbose_name='Комментарий к документу')
-    comment_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата добавления комментария')
-
-    def __str__(self):
-        return f"{self.id} {self.id_document} {self.id_user} {self.comment}"
+# class Comments(models.Model):
+#     """Модель таблицы для хранения комментариев"""
+#     class Meta:
+#         db_table = "comments"
+#         verbose_name = "Комментарии"
+#         verbose_name_plural = "Комментарии"
+#
+#     id = models.UUIDField(primary_key=True, verbose_name="Уникальный идентификатор комментария")
+#     id_document = models.ForeignKey(Documents, on_delete=models.RESTRICT,
+#                                     verbose_name='ID документа к которому добавлен комментарий')
+#     id_user = models.ForeignKey(Users, on_delete=models.RESTRICT,
+#                                 verbose_name='ID пользователя, добавившего комментарий')
+#     comment = models.TextField(blank=True, verbose_name='Комментарий к документу')
+#     comment_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата добавления комментария')
+#
+#     def __str__(self):
+#         return f"{self.id} {self.id_document} {self.id_user} {self.comment}"
 
 
 # валидация для прав доступа
@@ -215,49 +219,49 @@ def group_rights_validator(group_rights):
 
 
 # модель прав доступа
-class Rights(models.Model):
-    class Meta:
-        db_table = 'rights'
-        verbose_name = ("Права доступа")
-        verbose_name_plural = 'Права доступа'
-
-    id = models.IntegerField(primary_key=True, verbose_name='Идентификатор прав')
-    right_number = models.IntegerField(verbose_name='Номер прав', validators=[group_rights_validator])
-    rights_description = models.TextField(verbose_name='Описание права доступа')
-
-    def __str__(self):
-        return f"{self.id} {self.rights_description}"
+# class Rights(models.Model):
+#     class Meta:
+#         db_table = 'rights'
+#         verbose_name = ("Права доступа")
+#         verbose_name_plural = 'Права доступа'
+#
+#     id = models.IntegerField(primary_key=True, verbose_name='Идентификатор прав')
+#     right_number = models.IntegerField(verbose_name='Номер прав', validators=[group_rights_validator])
+#     rights_description = models.TextField(verbose_name='Описание права доступа')
+#
+#     def __str__(self):
+#         return f"{self.id} {self.rights_description}"
 
 
 # модель групп пользователей
-class User_groups(models.Model):
-    class Meta:
-        db_table = "user_groups"
-        verbose_name = "Группы пользователей"
-        verbose_name_plural = "Группы пользователей"
-
-    id = models.UUIDField(primary_key=True, verbose_name="Уникальный идентификатор группы пользователя")
-    group_name = models.TextField(verbose_name="Наименование группы пользователя")
-    group_rights = models.ForeignKey(Rights, on_delete=models.RESTRICT, verbose_name="Права для группы пользователя",
-                                     validators=[group_rights_validator])
-
-    def __str__(self):
-        return f"{self.id} {self.group_rights}"
+# class User_groups(models.Model):
+#     class Meta:
+#         db_table = "user_groups"
+#         verbose_name = "Группы пользователей"
+#         verbose_name_plural = "Группы пользователей"
+#
+#     id = models.UUIDField(primary_key=True, verbose_name="Уникальный идентификатор группы пользователя")
+#     group_name = models.TextField(verbose_name="Наименование группы пользователя")
+#     group_rights = models.ForeignKey(Rights, on_delete=models.RESTRICT, verbose_name="Права для группы пользователя",
+#                                      validators=[group_rights_validator])
+#
+#     def __str__(self):
+#         return f"{self.id} {self.group_rights}"
 
 
 # модель доступа для разных групп пользователей
-class Group_access(models.Model):
-    class Meta:
-        db_table = "group_access"
-        verbose_name = "Доступ для конкретной группы пользователей"
-        verbose_name_plural = "Доступ для конкретной группы пользователей"
-
-    id = models.UUIDField(primary_key=True, verbose_name="Права группы пользователя")
-    id_user_group = models.ForeignKey(User_groups, on_delete=models.RESTRICT, verbose_name='ID группы пользователя')
-    id_user = models.ForeignKey(Users, on_delete=models.RESTRICT, verbose_name='ID пользователя')
-
-    def __str__(self):
-        return f"{self.id} {self.id_user_group}"
+# class Group_access(models.Model):
+#     class Meta:
+#         db_table = "group_access"
+#         verbose_name = "Доступ для конкретной группы пользователей"
+#         verbose_name_plural = "Доступ для конкретной группы пользователей"
+#
+#     id = models.UUIDField(primary_key=True, verbose_name="Права группы пользователя")
+#     id_user_group = models.ForeignKey(User_groups, on_delete=models.RESTRICT, verbose_name='ID группы пользователя')
+#     id_user = models.ForeignKey(Users, on_delete=models.RESTRICT, verbose_name='ID пользователя')
+#
+#     def __str__(self):
+#         return f"{self.id} {self.id_user_group}"
 
 
 

@@ -2,11 +2,11 @@ from cProfile import label
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
 from django.shortcuts import redirect
-from .models import Entities, Files, Documents, Users, User_groups, RelationsFiles
+from .models import Entities, Files, Documents, RelationsFiles, RelationsDocuments
 import uuid
 from django.contrib.auth import login
 from django.contrib.auth.models import User
-from django.forms import ClearableFileInput
+from django.forms import ClearableFileInput, FileInput
 
 
 
@@ -20,10 +20,10 @@ class EntitiesForm(forms.ModelForm):
 
     class Meta:
         model = Entities
-        fields=('parent','ent_name', 'description', 'cat_file')
+        fields=('parent','ent_name', 'description')
 
         widgets = {
-            'ent_name': forms.TextInput(attrs={'class': 'form-input'}),
+            'ent_name': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'cols': 60, 'rows': 10})
         }
         
@@ -33,18 +33,29 @@ class DocumentsAddForm(forms.ModelForm):
     # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs)
     #     self.fields['doc_name'].empty_label = ''
+
     Language_choise = (
         ("0", "Русский"),
         ("1", "Английский"),
 
     )
+    Type_choise = (
+        ("ГОСТ", "ГОСТ"),
+        ("Спецификация", "Спецификация")
+    )
+
     document_language = forms.ChoiceField(choices=Language_choise)
+    doc_type = forms.ChoiceField(choices=Type_choise)
+    document = forms.FileField()
     class Meta:
         model = Documents
-        fields = ('doc_name', 'description', 'document_language')
+        fields = ('doc_name', 'document', 'doc_type', 'description', 'document_language')
         widgets = {
             'doc_name': forms.TextInput(attrs={'class': 'form-input'}),
             'description': forms.Textarea(attrs={'cols': 60, 'rows': 10}),
+            #'document': FileInput(),
+
+
 
         }
 
@@ -57,7 +68,7 @@ class FilesAddForm(forms.ModelForm):
 
     class Meta:
         model = Files
-        fields = ('id_document', 'file_name', 'file', 'file_version', 'add_data')
+        fields = ('file_name', 'file', 'file_version', 'add_data')
 
 
         widgets ={
@@ -103,6 +114,13 @@ class RelationFileForm(forms.ModelForm):
 
         model = RelationsFiles
         fields = ('id_entities', 'id_file')
+
+class RelationDocumetnForm(forms.ModelForm):
+    """ Форма для привязки файлов к категории"""
+    class Meta:
+
+        model = RelationsDocuments
+        fields = ('id_file', 'id_document')
 
 
 

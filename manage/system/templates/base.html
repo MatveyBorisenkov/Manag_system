@@ -8,6 +8,8 @@
 {% load group_tag %}
 {% load cat_file %}
 {% load cat_entities %}
+{% load doc_files %}
+{% load doc_file_relation %}
 
 <style>
     .container {
@@ -17,6 +19,12 @@
     }
     li {
         list-style-type: none;
+    }
+    .container-md {
+        border: 1px solid black;
+        width: 300px;
+        border-radius: 3%;
+        margin-left: 20px;
     }
 
 </style>
@@ -114,17 +122,18 @@
 {%if request.user.is_authenticated%}
     {% if request.user|has_group:"Администратор" %}
         <div class="container">
-           <div class="category-list-name">Доступные функции</div><br>
+           <div class="category-list-name">Доступные функции:</div><br>
             <a href='/form'><button type="GET" class="btn btn-secondary btn-sm">Создать категорию</button></a>
             <a href='/files'><button type="GET" class="btn btn-secondary btn-sm">Просмотреть файлы</button></a><br>
             <br><a href='/add-document'><button type="GET" class="btn btn-secondary btn-sm">Добавить документ</button></a>
             <a href='/add-file'><button type="GET" class="btn btn-secondary btn-sm">Добавить файл</button></a>
             <a href='/files-cat'><button type="GET" class="btn btn-secondary btn-sm">Привязать файл</button></a>
+            <a href='/doc-file'><button type="GET" class="btn btn-secondary btn-sm">Привязать документ</button></a>
             <hr>
 
             <div class="search">
                 <form action="/search-file/" method="get">
-                    <input name="q" type="text" placeholder="Search...">
+                    <input name="q" type="text" placeholder="Поиск...">
                     <button type="submit" class="btn btn-outline-secondary btn-sm">
                         <img src="../static/static_files/search.png" alt="Иконка" width="20" height="20">
                     </button>
@@ -193,26 +202,51 @@
 
 
 
-                                        {% for ent in ce %}
-                                            {% if node.id == ent.id_entities_id %}
-                                                {% for a in cf %}
-                                                    {% if ent.id_file_id == a.id %}
-                                                        <div class="files-cont">
+                                        <div class="container-md">
+                                            {% for ent in ce %}
+                                                {% if node.id == ent.id_entities_id %}
+                                                    {% for a in cf %}
+                                                        {% if ent.id_file_id == a.id %}
+                                                            <div class="files-cont">
 
-                                                            <a href="{{a.file.url}}" target="_blank">{{a.file_name}}</a>
-                                                            <div>{{a.file_version}}</div>
-                                                            <div>{{a.id_document.doc_name}}</div>
-                                                            <a href='/file-update'>Редактировать файл</a>
-                                                            <hr style="width:200px">
 
-                                                        <div>
 
-                                                    {% endif %}
-                                                {% endfor %}
 
-                                            {% endif %}
 
-                                        {% endfor %}
+                                                                <a href="{{a.file.url}}" target="_blank">{{a.file_name}}</a>
+                                                                <div>{{a.file_version}}</div>
+                                                                <div>
+                                                                    {% documets_info as di %}
+
+                                                                    {% docs_to_file as dtf %}
+
+
+
+                                                                    {% for doc in dtf %}
+                                                                        {% if doc.id_file_id == a.id %}
+                                                                            {% for docs in di %}
+                                                                                {% if doc.id_document_id == docs.id %}
+                                                                                    <div class="docs-list">
+                                                                                        <a href="{{docs.document.url}}" target="_blank">{{docs.doc_name}}</a>
+                                                                                        <div> ↑ Тип документа | {{docs.doc_type}}</div>
+                                                                                    </div>
+                                                                                {% endif %}
+                                                                            {% endfor %}
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                </div>
+                                                                <a href='/file-update'>Редактировать файл</a>
+                                                                <hr style="width:200px">
+
+                                                            <div>
+
+                                                        {% endif %}
+                                                    {% endfor %}
+
+                                                {% endif %}
+
+                                            {% endfor %}
+                                        </div>
 
 
 
@@ -420,5 +454,6 @@
     {% endif %}
 {%endif%}
 
+<hr>
 
 
