@@ -28,7 +28,7 @@ class Documents(models.Model):
     doc_name = models.TextField(verbose_name='Название документа')
     doc_type = models.CharField(max_length=80, verbose_name="Тип документа")
     description = models.TextField(verbose_name='Описание документа')
-    document_language = models.IntegerField(verbose_name='Язык докуменат')#validators=[document_language_validator])
+    document_language = models.CharField(max_length=80, verbose_name='Язык докуменат')#validators=[document_language_validator])
     document = models.FileField(blank=True, null=True, upload_to='docs/', verbose_name='Документ')
 
     def get_html_document(self, object):

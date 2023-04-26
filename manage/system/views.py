@@ -1,4 +1,5 @@
 from _ast import Add
+from xml.dom.minidom import Document
 
 from django.contrib.auth import logout
 from django.contrib.auth.forms import AuthenticationForm
@@ -8,7 +9,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import loader, Context, RequestContext
 from django.views.generic import ListView
-from .models import Entities, Files
+from .models import Entities, Files, Documents
 from .forms import EntitiesForm, DocumentsAddForm, FilesAddForm, RegisterUserForm, RelationFileForm, DeleteCatForm, RelationDocumetnForm
 from django.views.generic import ListView, DetailView, CreateView, View, TemplateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
@@ -352,6 +353,11 @@ class ViewFiles(ListView):
     template_name = 'files_view.html'
 
 
+class ViewDocument(ListView):
+
+    model = Documents
+    template_name = 'docs_views.html'
+
 class FileUpdate(UpdateView):
     """
     A class-based view for updating an existing file object.
@@ -421,6 +427,21 @@ class SearchFiles(ListView):
 
         return object_list
 
+
+class SearchDocs(ListView):
+
+    model = Documents
+    template_name = 'search_docs_result.html'
+
+    def get_queryset(self):
+        query = self.request.GET.get('w')
+
+        object_list = Documents.objects.filter(
+            Q(doc_name__icontains=query)
+        )
+
+
+        return object_list
 
 
 class DeleteCategory(DeleteView):

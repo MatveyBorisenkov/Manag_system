@@ -18,7 +18,7 @@ from django.urls import re_path
 from django.conf import settings
 from django.views.static import serve
 from django.urls import path
-from system.views import EntitiesListView, DocumentCreate, LoginUser, ViewFiles, FileUpdate, FileCreate, FilesToCategories, SearchFiles, AddEntities, DocumentsToFiles
+from system.views import EntitiesListView, DocumentCreate, LoginUser, ViewFiles, FileUpdate, FileCreate, FilesToCategories, SearchFiles, AddEntities, DocumentsToFiles, ViewDocument, SearchDocs
 from system.views import category_detail, entities_form, files_form, logout_user, UserRegister, DeleteCategory, delete_cat, change_password
 from django.contrib.auth import views
 
@@ -40,6 +40,8 @@ urlpatterns = [
     path('category/<new_id>/delete', delete_cat, name= "delete"),
     path('password-change/', change_password, name='password_change'),
     path('doc-file/', DocumentsToFiles.as_view(), name = 'doc-files'),
+    path('documents/', ViewDocument.as_view(), name = 'docs'),
+    path('search-docs/', SearchDocs.as_view(), name = 'search-docs'),
     #path('password-change/', views.PasswordChangeView.as_view(), name='password_change'),
    # path('password-change/done/', views.PasswordChangeDoneView.as_view(), name='password_change_done'),
 ]

@@ -35,8 +35,8 @@ class DocumentsAddForm(forms.ModelForm):
     #     self.fields['doc_name'].empty_label = ''
 
     Language_choise = (
-        ("0", "Русский"),
-        ("1", "Английский"),
+        ("Русский", "Русский"),
+        ("Английский", "Английский"),
 
     )
     Type_choise = (
