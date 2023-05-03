@@ -56,16 +56,21 @@ class Files(models.Model):
     file = models.FileField(blank=True, null=True, upload_to='files/%Y/%m/%D/', verbose_name='Файлы')
     file_version = models.CharField(max_length=20, verbose_name='Версия файла')
     add_data = models.DateTimeField(default=timezone.now, verbose_name='Дата добавления')
-    #slug = models.SlugField(max_length=255, unique=True, db_index=True, default=True, verbose_name='URL')
+    slug = models.SlugField(unique=True, verbose_name='URL')
 
     def get_html_file(self, object):
         if object.file:
             return mark_safe(f"<a href='{object.file.url}', width=400")
     def __str__(self):
-        return f"{self.id} {self.file_name} {self.file_version} {self.file}"
+        return f"{self.id} {self.file_name} {self.file_version} {self.file} {self.slug}"
+
+    # def get_absolute_url(self):
+    #     return reverse('cat-files')
 
     def get_absolute_url(self):
-        return reverse('cat-files')
+        return reverse('cat-files', kwargs={'slug': self.slug})
+
+
 
 
 

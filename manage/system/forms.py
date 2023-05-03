@@ -6,8 +6,7 @@ from .models import Entities, Files, Documents, RelationsFiles, RelationsDocumen
 import uuid
 from django.contrib.auth import login
 from django.contrib.auth.models import User
-from django.forms import ClearableFileInput, FileInput
-
+from django.forms import ClearableFileInput, FileInput, SlugField
 
 
 class EntitiesForm(forms.ModelForm):
@@ -68,13 +67,14 @@ class FilesAddForm(forms.ModelForm):
 
     class Meta:
         model = Files
-        fields = ('file_name', 'file', 'file_version', 'add_data')
+        fields = ('file_name', 'file', 'file_version', 'add_data', 'slug')
 
 
         widgets ={
             'file_name': forms.TextInput(attrs={'class': 'form-control'}),
             'file_version': forms.TextInput(attrs={'class': 'form-control'}),
             'file': ClearableFileInput(attrs={'multiple': True}),
+
 
 
         }
@@ -87,7 +87,7 @@ class RegisterUserForm(UserCreationForm):
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     password2 = forms.CharField(label='Password again', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     choice = (
-        ("Нет", "Нет"),
+        ("Нет доступа", "Нет доступа"),
 
     )
     default_group = forms.ChoiceField(widget=forms.RadioSelect, choices=choice)
@@ -129,3 +129,4 @@ class DeleteCatForm(forms.ModelForm):
     class Meta:
         model = Entities
         fields = '__all__'
+

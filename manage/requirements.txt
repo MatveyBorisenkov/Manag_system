@@ -4,4 +4,3 @@ django-mptt
 django-mptt-admin
 django-bootstrap-v5
 django-crispy-forms
-crispy-bootstrap5

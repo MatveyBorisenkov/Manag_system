@@ -276,7 +276,7 @@ def UserRegister(request):
         form = RegisterUserForm(request.POST)
         if form.is_valid():
             user = form.save()
-            group = Group.objects.get(name='Нет')
+            group = Group.objects.get(name='Нет доступа')
             user.groups.add(group)
             return redirect('login')
     else:
@@ -375,8 +375,10 @@ class FileUpdate(UpdateView):
     """
 
     model = Files
-    template_name = 'file_create_form.html'
-    fields = {'file_name', 'file', 'file_version' }
+    template_name = 'update_files.html'
+    fields = {'file_name', 'file', 'file_version'}
+    success_url = reverse_lazy("category-list")
+
 
 
 class FilesToCategories(CreateView):
