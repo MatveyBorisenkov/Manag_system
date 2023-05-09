@@ -1,6 +1,11 @@
 <!-- TODO: Убрать ненужные закомментированные строчки кода -->
 <!-- Базовый шаблон главной страницы -->
 
+
+
+
+<!doctype html>
+<html lang="en">
 {% load bootstrap5 %}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
@@ -10,8 +15,15 @@
 {% load cat_entities %}
 {% load doc_files %}
 {% load doc_file_relation %}
+{% load static %}
 
-<style>
+<head>
+
+
+    <style>
+    html {
+        height: 100%;
+    }
     .container {
         margin-left: 20px;
         margin-top: 20px;
@@ -27,7 +39,37 @@
         margin-left: 20px;
     }
 
-</style>
+    nav {
+        background-color: #E3FDFD;
+
+    }
+
+    header, body {
+        margin: 0;
+        padding: 0;
+
+    }
+
+    body {
+        height: 100%
+    }
+
+    .navbar navbar-expand-lg bg-body-tertiary {
+        margin : 0;
+        padding: 0;
+    }
+
+    footer {
+	    background: gray;
+	    margin-top: -10px;
+    }
+
+
+
+
+
+
+    </style>
 
 <style>
          .btn btn-link 1 {
@@ -95,8 +137,53 @@
         }
 
     </script>
+    <meta charset="UTF-8">
+    <!--<meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">-->
+    <title>Manage system</title>
 
-<div class="container">
+
+<header>
+    {%if request.user.is_authenticated%}
+        {% if request.user|has_group:"Администратор" %}
+
+
+               <nav class="navbar navbar-expand-lg bg-body-tertiary">
+                    <div class="container-fluid">
+
+                        <a href='/form'><button type="GET" class="btn btn-secondary btn-sm">Создать категорию </button></a>
+                        <a href='/files'><button type="GET" class="btn btn-secondary btn-sm">Просмотреть файлы</button></a>
+                        <a href='/documents'><button type="GET" class="btn btn-secondary btn-sm">Просмотреть документы</button></a>
+                        <a href='/add-document'><button type="GET" class="btn btn-secondary btn-sm">Добавить документ</button></a>
+                        <a href='/add-file'><button type="GET" class="btn btn-secondary btn-sm">Добавить файл</button></a>
+                        <a href='/files-cat'><button type="GET" class="btn btn-secondary btn-sm">Привязать файл</button></a>
+                        <a href='/doc-file'><button type="GET" class="btn btn-secondary btn-sm">Привязать документ</button></a>
+
+                        <li class="last">
+                            <div class="dropdown">
+                                {{user.username}} |
+                                <button onclick="myFunction()" class="btn btn-link 1">⇊</button>
+                                <div id="myDropdown" class="dropdown-content">
+                                    <a href="/logout"><button type="GET" class="btn btn-link">Выйти</button></a>
+                                    <a href='/password-change'><button type="GET" class="btn btn-link">Сменить пароль</button></a>
+                                </div>
+                            </div>
+                        </li>
+                    </div>
+               </nav>
+
+
+        {% endif %}
+    {% endif %}
+
+</header>
+</head>
+
+<body>
+
+
+<!--iv class="container">
     {%if request.user.is_authenticated%}
 
 
@@ -116,364 +203,370 @@
     {%else%}
         <li class="last"><a href="/register">Registration</a> | <a href="/login">Login</a></li>
     {%endif%}
-</div>
-
-<div class="container">
-    <hr>
-</div>
-
-{%if request.user.is_authenticated%}
-    {% if request.user|has_group:"Администратор" %}
-        <div class="container">
-           <div class="category-list-name">Доступные функции:</div><br>
-            <a href='/form'><button type="GET" class="btn btn-secondary btn-sm">Создать категорию</button></a>
-            <a href='/files'><button type="GET" class="btn btn-secondary btn-sm">Просмотреть файлы</button></a>
-            <a href='/documents'><button type="GET" class="btn btn-secondary btn-sm">Просмотреть документы</button></a><br>
-            <br><a href='/add-document'><button type="GET" class="btn btn-secondary btn-sm">Добавить документ</button></a>
-            <a href='/add-file'><button type="GET" class="btn btn-secondary btn-sm">Добавить файл</button></a>
-            <br>
-            <br>
-            <a href='/files-cat'><button type="GET" class="btn btn-secondary btn-sm">Привязать файл</button></a>
-            <a href='/doc-file'><button type="GET" class="btn btn-secondary btn-sm">Привязать документ</button></a>
-            <hr>
-           
-            <div class="search">
-                <div>Поиск файлов</div>
-                <form action="/search-file/" method="get">
-                    <input name="q" type="text" placeholder="Поиск...">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm">
-                        <img src="../static/static_files/search.png" alt="Иконка" width="20" height="20">
-                    </button>
-                </form>
-            </div>
-
-            <div class="search1">
-                <div>Поиск документов</div>
-                <form action="/search-docs/" method="get">
-                    <input name="w" type="text" placeholder="Поиск...">
-                    <button type="submit" class="btn btn-outline-success btn-sm">
-                        <img src="../static/static_files/search.png" alt="Иконка" width="20" height="20">
-                    </button>
-                </form>
-            </div>
-
-            <hr>
-
-            <div>Дерево категорий:</div>
-            <ul>
-
-
-            {% recursetree object_list %}
-
-                <li>
-                    <!--<a href="/category/{{ node.ent_name }}/">
-                    {{ node.ent_name }}
-                    {{ node.id }}
-                    {{ node.level }}
-                    </a>-->
-                    <a href="/category/{{ node.id }}/">
-                    {{ node.ent_name }}
-                    <!--{{ node.id }}-->
-                    <!--{{ node.level }}-->
-                    </a>
-                    {% if node.is_root_node %}
-                        {% if node.id == root_category_id %}
-                            {% if not node.is_leaf_node %}
-                                <ul class="children">
-                                    {{ children }}
-
-
-                                </ul>
-                            {% endif %}
-                        {% endif %}
-
-                    {% else %}
-                        {% if not node.is_leaf_node %}
-                            {% if current_category.id == node.id %}
-                                <ul class="children">
-                                    {{ children }}
+</div>-->
 
 
 
+    {%if request.user.is_authenticated%}
+        {% if request.user|has_group:"Администратор" %}
+
+            <div class="container">
+               <!--<nav class="navbar navbar-expand-lg bg-body-tertiary">
+                    <div class="container-fluid">
+                        <a href='/form'><button type="GET" class="btn btn-secondary btn-sm">Создать категорию </button></a>
+                        <a href='/files'><button type="GET" class="btn btn-secondary btn-sm">Просмотреть файлы</button></a>
+                        <a href='/documents'><button type="GET" class="btn btn-secondary btn-sm">Просмотреть документы</button></a>
+                        <a href='/add-document'><button type="GET" class="btn btn-secondary btn-sm">Добавить документ</button></a>
+                        <a href='/add-file'><button type="GET" class="btn btn-secondary btn-sm">Добавить файл</button></a>
+                        <a href='/files-cat'><button type="GET" class="btn btn-secondary btn-sm">Привязать файл</button></a>
+                        <a href='/doc-file'><button type="GET" class="btn btn-secondary btn-sm">Привязать документ</button></a>
+                    </div>
+               </nav>
+                   <hr>-->
+
+                <div class="search">
+                    <div>Поиск файлов</div>
+                    <form action="/search-file/" method="get">
+                        <input name="q" type="text" placeholder="Поиск...">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">
+                            <img src= "{% static '../static/static_files/search.png'  %}" alt="Иконка" width="20" height="20">
+                        </button>
+                    </form>
+                </div>
+
+                <div class="search1">
+                    <div>Поиск документов</div>
+                    <form action="/search-docs/" method="get">
+                        <input name="w" type="text" placeholder="Поиск...">
+                        <button type="submit" class="btn btn-outline-success btn-sm">
+                            <img src="{% static '../static/static_files/search.png'  %}" alt="Иконка" width="20" height="20">
+                        </button>
+                    </form>
+                </div>
+
+                <hr>
+
+                <div>Дерево категорий:</div>
+                <ul>
 
 
+                {% recursetree object_list %}
+
+                    <li>
+                        <!--<a href="/category/{{ node.ent_name }}/">
+                        {{ node.ent_name }}
+                        {{ node.id }}
+                        {{ node.level }}
+                        </a>-->
+                        <a href="/category/{{ node.id }}/">
+                        {{ node.ent_name }}
+                        <!--{{ node.id }}-->
+                        <!--{{ node.level }}-->
+                        </a>
+                        {% if node.is_root_node %}
+                            {% if node.id == root_category_id %}
+                                {% if not node.is_leaf_node %}
+                                    <ul class="children">
+                                        {{ children }}
 
 
-                                </ul>
-
-                            {% elif node.level < current_category.level %}
-                                <ul class="children">
-                                    {{ children }}
-                                </ul>
-                            {% endif %}
-                        {% endif %}
-
-                    {% if node.is_leaf_node %}
-                            {% if current_category.id == node.id %}
-                                {% if node.cat_file_id != "NULL" %}
-                                    <ul class="files-currrent-list">
-                                        {% current_category_files as cf %}
-
-                                        {% current_entities as ce %}
-
-
-
-
-                                        <div class="container-md">
-                                            {% for ent in ce %}
-                                                {% if node.id == ent.id_entities_id %}
-                                                    {% for a in cf %}
-                                                        {% if ent.id_file_id == a.id %}
-                                                            <div class="files-cont">
-
-
-
-
-
-                                                                <a href="{{a.file.url}}" target="_blank">{{a.file_name}}</a>
-                                                                <div>Версия файла: {{a.file_version}}</div>
-                                                                <div>Slug: {{a.slug}}</div>
-                                                                <div>
-                                                                    {% documets_info as di %}
-
-                                                                    {% docs_to_file as dtf %}
-
-
-
-                                                                    {% for doc in dtf %}
-                                                                        {% if doc.id_file_id == a.id %}
-                                                                            {% for docs in di %}
-                                                                                {% if doc.id_document_id == docs.id %}
-                                                                                    <div class="docs-list">
-                                                                                        <a href="{{docs.document.url}}" target="_blank">{{docs.doc_name}}</a>
-                                                                                        <div> ↑ Тип документа | {{docs.doc_type}}</div>
-                                                                                    </div>
-                                                                                {% endif %}
-                                                                            {% endfor %}
-                                                                        {% endif %}
-                                                                    {% endfor %}
-                                                                </div>
-                                                                <a href='/file-update/{{a.slug}}'>Редактировать файл</a>
-                                                                <hr style="width:200px">
-
-                                                            <div>
-
-                                                        {% endif %}
-                                                    {% endfor %}
-
-                                                {% endif %}
-
-                                            {% endfor %}
-                                        </div>
-
-
-
-
-
-
-
-
-
-
-
-
-                                            <!--{% if node.cat_file_id == cf.id %}
-                                                <a href="{{file.file.url}}" target="_blank">{{file.file_name}}</a>
-                                                <div>{{file.file_version}}</div>
-                                                 <div>{{file.id_document.doc_name}}</div><br>
-                                            {% else %}
-                                                <div>Нет файлов</div>
-                                            {% endif %}-->
-
-
-
-                                    </ul>
-                                {% else %}
-                                    <ul class="none-files-currrent-list">
-                                        <div>Нет прикрепленных файлов</div>
                                     </ul>
                                 {% endif %}
                             {% endif %}
-                    {% endif %}
 
-                    {% endif %}
-                </li>
-            {% endrecursetree %}
-                <a href='/'><button type="GET" class="btn btn-secondary btn-sm">Назад</button></a>
-
-            </ul>
-        </div>
-        <!--<a href='/login'><button type="GET">Авторизоваться</button></a>
-        <a href='/register'><button type="GET">Зарегистрироваться</button></a>-->
-    {% endif %}
-
-    {% if request.user|has_group:"Полный" %}
-        <div class="container">
-            <div class="category-list-name">Доступные функции</div>
-            <a href='/files'><button type="GET">Просмотреть файлы</button></a><br>
-            <a href='/form'><button type="GET">Создать категорию</button></a> <br>
-            <br><a href='/add-document'><button type="GET">Добавить документ</button></a>
-            <a href='/add-file'><button type="GET">Добавить файл</button></a>
-            <hr>
-            <div>Дерево категорий</div>
-            <ul>
-            {% recursetree object_list %}
-                <li>
-                    <!--<a href="/category/{{ node.ent_name }}/">
-                    {{ node.ent_name }}
-                    {{ node.id }}
-                    {{ node.level }}
-                    </a>-->
-                    <a href="/category/{{ node.id }}/">
-                    {{ node.ent_name }}
-                    <!--{{ node.id }}-->
-                    <!--{{ node.level }}-->
-                    </a>
-                    {% if node.is_root_node %}
-                        {% if node.id == root_category_id %}
+                        {% else %}
                             {% if not node.is_leaf_node %}
-                                <ul class="children">
-                                    {{ children }}
-                                </ul>
+                                {% if current_category.id == node.id %}
+                                    <ul class="children">
+                                        {{ children }}
+
+
+
+
+
+
+
+                                    </ul>
+
+                                {% elif node.level < current_category.level %}
+                                    <ul class="children">
+                                        {{ children }}
+                                    </ul>
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
 
-                    {% else %}
-                        {% if not node.is_leaf_node %}
-                            {% if current_category.id == node.id %}
-                                <ul class="children">
-                                    {{ children }}
-                                </ul>
-                            {% elif node.level < current_category.level %}
-                                <ul class="children">
-                                    {{ children }}
-                                </ul>
-                            {% endif %}
-                        {% endif %}
-                    {% endif %}
-                </li>
-            {% endrecursetree %}
-            </ul>
-        </div>
-        <!--<a href='/login'><button type="GET">Авторизоваться</button></a>
-        <a href='/register'><button type="GET">Зарегистрироваться</button></a>-->
-    {% endif %}
+                        {% if node.is_leaf_node %}
+                                {% if current_category.id == node.id %}
+                                    {% if node.cat_file_id != "NULL" %}
+                                        <ul class="files-currrent-list">
+                                            {% current_category_files as cf %}
 
-    {% if request.user|has_group:"Редактирование" %}
-        <div class="container">
-            <div class="category-list-name">Доступные функции</div><br>
-            <a href='/files'><button type="GET">Просмотреть файлы</button></a>
-            <a href='/add-document'><button type="GET">Добавить документ</button></a>
-            <a href='/add-file'><button type="GET">Добавить файл</button></a>
-            <hr>
-            <div>Дерево категорий</div>
-            <ul>
-            {% recursetree object_list %}
-                <li>
-                    <!--<a href="/category/{{ node.ent_name }}/">
-                    {{ node.ent_name }}
-                    {{ node.id }}
-                    {{ node.level }}
-                    </a>-->
-                    <a href="/category/{{ node.id }}/">
-                    {{ node.ent_name }}
-                    <!--{{ node.id }}-->
-                    <!--{{ node.level }}-->
-                    </a>
-                    {% if node.is_root_node %}
-                        {% if node.id == root_category_id %}
-                            {% if not node.is_leaf_node %}
-                                <ul class="children">
-                                    {{ children }}
-                                </ul>
-                            {% endif %}
-                        {% endif %}
+                                            {% current_entities as ce %}
 
-                    {% else %}
-                        {% if not node.is_leaf_node %}
-                            {% if current_category.id == node.id %}
-                                <ul class="children">
-                                    {{ children }}
-                                </ul>
-                            {% elif node.level < current_category.level %}
-                                <ul class="children">
-                                    {{ children }}
-                                </ul>
-                            {% endif %}
-                        {% endif %}
-                    {% endif %}
-                </li>
-            {% endrecursetree %}
-            </ul>
-        </div>
-    {% endif %}
 
-    {% if request.user|has_group:"Просмотр" %}
-        <div class="container">
-            <div>У вас недостаточно прав для доступа к данному разделу</div>
-            <a href='/form'><button type="GET">Создать категорию</button></a> <br>
 
-            <hr>
-            <div>Дерево категорий</div>
-            <ul>
-            {% recursetree object_list %}
-                <li>
-                    <!--<a href="/category/{{ node.ent_name }}/">
-                    {{ node.ent_name }}
-                    {{ node.id }}
-                    {{ node.level }}
-                    </a>-->
-                    <a href="/category/{{ node.id }}/">
-                    {{ node.ent_name }}
-                    <!--{{ node.id }}-->
-                    <!--{{ node.level }}-->
-                    </a>
-                    {% if node.is_root_node %}
-                        {% if node.id == root_category_id %}
-                            {% if not node.is_leaf_node %}
-                                <ul class="children">
-                                    {{ children }}
-                                </ul>
-                            {% endif %}
-                        {% endif %}
 
-                    {% else %}
-                        {% if not node.is_leaf_node %}
-                            {% if current_category.id == node.id %}
-                                <ul class="children">
-                                    {{ children }}
-                                    <!-- TODO: разобраться с выводом списка фалов для подкатегорий -->
-                                    {% block content %}
-                                        <ul class="files-list">
-                                            {% for file in object_list %}
-                                                <p class="first">File name: {{file.file_name}}</p>
+                                            <div class="container-md">
+                                                {% for ent in ce %}
+                                                    {% if node.id == ent.id_entities_id %}
+                                                        {% for a in cf %}
+                                                            {% if ent.id_file_id == a.id %}
+                                                                <div class="files-cont">
 
-                                                <!--<a href="{{file.file}}" download="newfilename">Файл</a>-->
-                                                <a href="{{file.file.url}}" target="_blank">Просмотреть файл</a>
 
-                                            {% endfor %}
+
+
+
+                                                                    <a href="{{a.file.url}}" target="_blank">{{a.file_name}}</a>
+                                                                    <div>Версия файла: {{a.file_version}}</div>
+                                                                    <div>Slug: {{a.slug}}</div>
+                                                                    <div>
+                                                                        {% documets_info as di %}
+
+                                                                        {% docs_to_file as dtf %}
+
+
+
+                                                                        {% for doc in dtf %}
+                                                                            {% if doc.id_file_id == a.id %}
+                                                                                {% for docs in di %}
+                                                                                    {% if doc.id_document_id == docs.id %}
+                                                                                        <div class="docs-list">
+                                                                                            <a href="{{docs.document.url}}" target="_blank">{{docs.doc_name}}</a>
+                                                                                            <div> ↑ Тип документа | {{docs.doc_type}}</div>
+                                                                                        </div>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                    <a href='/file-update/{{a.slug}}'>Редактировать файл</a>
+                                                                    <hr style="width:200px">
+
+                                                                <div>
+
+                                                            {% endif %}
+                                                        {% endfor %}
+
+                                                    {% endif %}
+
+                                                {% endfor %}
+                                            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+                                                <!--{% if node.cat_file_id == cf.id %}
+                                                    <a href="{{file.file.url}}" target="_blank">{{file.file_name}}</a>
+                                                    <div>{{file.file_version}}</div>
+                                                     <div>{{file.id_document.doc_name}}</div><br>
+                                                {% else %}
+                                                    <div>Нет файлов</div>
+                                                {% endif %}-->
+
+
+
                                         </ul>
+                                    {% else %}
+                                        <ul class="none-files-currrent-list">
+                                            <div>Нет прикрепленных файлов</div>
+                                        </ul>
+                                    {% endif %}
+                                {% endif %}
+                        {% endif %}
 
-                                    {% endblock %}
-                                </ul>
-                            {% elif node.level < current_category.level %}
-                                <ul class="children">
-                                    {{ children }}
-                                </ul>
+                        {% endif %}
+                    </li>
+                {% endrecursetree %}
+                    <a href='/'><button type="GET" class="btn btn-secondary btn-sm">Назад</button></a>
+
+                </ul>
+            </div>
+            <!--<a href='/login'><button type="GET">Авторизоваться</button></a>
+            <a href='/register'><button type="GET">Зарегистрироваться</button></a>-->
+        {% endif %}
+
+        {% if request.user|has_group:"Полный" %}
+            <div class="container">
+                <div class="category-list-name">Доступные функции</div>
+                <a href='/files'><button type="GET">Просмотреть файлы</button></a><br>
+                <a href='/form'><button type="GET">Создать категорию</button></a> <br>
+                <br><a href='/add-document'><button type="GET">Добавить документ</button></a>
+                <a href='/add-file'><button type="GET">Добавить файл</button></a>
+                <hr>
+                <div>Дерево категорий</div>
+                <ul>
+                {% recursetree object_list %}
+                    <li>
+                        <!--<a href="/category/{{ node.ent_name }}/">
+                        {{ node.ent_name }}
+                        {{ node.id }}
+                        {{ node.level }}
+                        </a>-->
+                        <a href="/category/{{ node.id }}/">
+                        {{ node.ent_name }}
+                        <!--{{ node.id }}-->
+                        <!--{{ node.level }}-->
+                        </a>
+                        {% if node.is_root_node %}
+                            {% if node.id == root_category_id %}
+                                {% if not node.is_leaf_node %}
+                                    <ul class="children">
+                                        {{ children }}
+                                    </ul>
+                                {% endif %}
+                            {% endif %}
+
+                        {% else %}
+                            {% if not node.is_leaf_node %}
+                                {% if current_category.id == node.id %}
+                                    <ul class="children">
+                                        {{ children }}
+                                    </ul>
+                                {% elif node.level < current_category.level %}
+                                    <ul class="children">
+                                        {{ children }}
+                                    </ul>
+                                {% endif %}
                             {% endif %}
                         {% endif %}
-                    {% endif %}
-                </li>
-            {% endrecursetree %}
-            </ul>
-        </div>
+                    </li>
+                {% endrecursetree %}
+                </ul>
+            </div>
+            <!--<a href='/login'><button type="GET">Авторизоваться</button></a>
+            <a href='/register'><button type="GET">Зарегистрироваться</button></a>-->
+        {% endif %}
+
+        {% if request.user|has_group:"Редактирование" %}
+            <div class="container">
+                <div class="category-list-name">Доступные функции</div><br>
+                <a href='/files'><button type="GET">Просмотреть файлы</button></a>
+                <a href='/add-document'><button type="GET">Добавить документ</button></a>
+                <a href='/add-file'><button type="GET">Добавить файл</button></a>
+                <hr>
+                <div>Дерево категорий</div>
+                <ul>
+                {% recursetree object_list %}
+                    <li>
+                        <!--<a href="/category/{{ node.ent_name }}/">
+                        {{ node.ent_name }}
+                        {{ node.id }}
+                        {{ node.level }}
+                        </a>-->
+                        <a href="/category/{{ node.id }}/">
+                        {{ node.ent_name }}
+                        <!--{{ node.id }}-->
+                        <!--{{ node.level }}-->
+                        </a>
+                        {% if node.is_root_node %}
+                            {% if node.id == root_category_id %}
+                                {% if not node.is_leaf_node %}
+                                    <ul class="children">
+                                        {{ children }}
+                                    </ul>
+                                {% endif %}
+                            {% endif %}
+
+                        {% else %}
+                            {% if not node.is_leaf_node %}
+                                {% if current_category.id == node.id %}
+                                    <ul class="children">
+                                        {{ children }}
+                                    </ul>
+                                {% elif node.level < current_category.level %}
+                                    <ul class="children">
+                                        {{ children }}
+                                    </ul>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    </li>
+                {% endrecursetree %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if request.user|has_group:"Просмотр" %}
+            <div class="container">
+                <div>У вас недостаточно прав для доступа к данному разделу</div>
+                <a href='/form'><button type="GET">Создать категорию</button></a> <br>
+
+                <hr>
+                <div>Дерево категорий</div>
+                <ul>
+                {% recursetree object_list %}
+                    <li>
+                        <!--<a href="/category/{{ node.ent_name }}/">
+                        {{ node.ent_name }}
+                        {{ node.id }}
+                        {{ node.level }}
+                        </a>-->
+                        <a href="/category/{{ node.id }}/">
+                        {{ node.ent_name }}
+                        <!--{{ node.id }}-->
+                        <!--{{ node.level }}-->
+                        </a>
+                        {% if node.is_root_node %}
+                            {% if node.id == root_category_id %}
+                                {% if not node.is_leaf_node %}
+                                    <ul class="children">
+                                        {{ children }}
+                                    </ul>
+                                {% endif %}
+                            {% endif %}
+
+                        {% else %}
+                            {% if not node.is_leaf_node %}
+                                {% if current_category.id == node.id %}
+                                    <ul class="children">
+                                        {{ children }}
+                                        <!-- TODO: разобраться с выводом списка фалов для подкатегорий -->
+                                        {% block content %}
+                                            <ul class="files-list">
+                                                {% for file in object_list %}
+                                                    <p class="first">File name: {{file.file_name}}</p>
+
+                                                    <!--<a href="{{file.file}}" download="newfilename">Файл</a>-->
+                                                    <a href="{{file.file.url}}" target="_blank">Просмотреть файл</a>
+
+                                                {% endfor %}
+                                            </ul>
+
+                                        {% endblock %}
+                                    </ul>
+                                {% elif node.level < current_category.level %}
+                                    <ul class="children">
+                                        {{ children }}
+                                    </ul>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    </li>
+                {% endrecursetree %}
+                </ul>
+            </div>
+        {%endif%}
+
+        {% if request.user|has_group:"Нет доступа" %}
+            <div class="container">Нет прав на просмотр содердимого</div>
+        {% endif %}
     {%endif%}
 
-    {% if request.user|has_group:"Нет доступа" %}
-        <div class="container">Нет прав на просмотр содердимого</div>
-    {% endif %}
-{%endif%}
-
-<hr>
+    <hr>
 
 
+</body>
+
+<footer>
+    <div>ТО что сделал я, копировать опасно!</div>
+</footer>
+</html>
